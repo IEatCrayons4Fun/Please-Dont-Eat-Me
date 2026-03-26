@@ -4,18 +4,25 @@ public class TrackingEnemy : MonoBehaviour
 {
     private Transform target;
     [SerializeField] private float damping = 5f;
-
-    // How often (seconds) to search for the nearest enemy. Reduces cost vs searching every frame.
     [SerializeField] private float searchInterval = 0.25f;
     private float searchTimer = 0f;
 
+    // Reference to the turret to access its in-range list
+    private TriggerTurret turret;
+
+    private void Start()
+    {
+        turret = GetComponent<TriggerTurret>();
+        // If TrackingEnemy is on a child object, use GetComponentInParent instead:
+        // turret = GetComponentInParent<TriggerTurret>();
+    }
+
     private void FixedUpdate()
     {
-        // Rotation logic: only runs when there is a target
         if (target != null)
         {
             Vector3 lookPos = target.position - transform.position;
-            lookPos.y = 0f; // keep turret level on Y
+            lookPos.y = 0f;
             if (lookPos.sqrMagnitude > 0.0001f)
             {
                 Quaternion rotation = Quaternion.LookRotation(lookPos);
@@ -26,7 +33,6 @@ public class TrackingEnemy : MonoBehaviour
 
     private void Update()
     {
-        // Update search timer on Update (not FixedUpdate) so it is in real time
         searchTimer -= Time.deltaTime;
         if (searchTimer <= 0f)
         {
@@ -37,19 +43,28 @@ public class TrackingEnemy : MonoBehaviour
 
     private void FindClosestEnemy()
     {
-        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
-        if (enemies == null || enemies.Length == 0)
+        // If turret exists, only consider enemies inside its detection range
+        if (turret != null && turret.enemiesInRange.Count > 0)
         {
-            target = null;
+            target = GetClosestFromList(turret.enemiesInRange);
             return;
         }
 
+        // Fallback: no turret ref or no enemies in range, clear target
+        target = null;
+    }
+
+    private Transform GetClosestFromList(System.Collections.Generic.List<GameObject> enemies)
+    {
         GameObject closest = null;
         float closestDistSq = Mathf.Infinity;
         Vector3 myPos = transform.position;
 
-        for (int i = 0; i < enemies.Length; i++)
+        for (int i = 0; i < enemies.Count; i++)
         {
+            // Skip destroyed enemies
+            if (enemies[i] == null) continue;
+
             Vector3 diff = enemies[i].transform.position - myPos;
             float distSq = diff.sqrMagnitude;
             if (distSq < closestDistSq)
@@ -59,6 +74,6 @@ public class TrackingEnemy : MonoBehaviour
             }
         }
 
-        target = (closest != null) ? closest.transform : null;
+        return closest != null ? closest.transform : null;
     }
 }

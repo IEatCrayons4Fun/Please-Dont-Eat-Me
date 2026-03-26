@@ -1,6 +1,5 @@
 using UnityEngine;
 using System.Collections;
-using System.Collections.Generic;
 
 public class Bullet : MonoBehaviour
 {
@@ -9,28 +8,54 @@ public class Bullet : MonoBehaviour
     public Rigidbody rb;
     public float maxLifetime;
     private Coroutine lifetime;
+
     private void Start()
     {
         rb = this.GetComponent<Rigidbody>();
     }
+
     private void OnEnable()
     {
-        if(lifetime == null){
+        Debug.Log("Bullet enabled, maxLifetime: " + maxLifetime);
+        if (lifetime == null)
+        {
             lifetime = StartCoroutine(MaxLifetime());
         }
         else
         {
-            StopCoroutine(MaxLifetime());
+            StopCoroutine(lifetime);
             lifetime = StartCoroutine(MaxLifetime());
         }
     }
-    private void OnTriggerEnter(Collider other){
-        if(!other.gameObject.CompareTag("TurretTrap")){
-            if(other.gameObject.CompareTag("Player")){
-                other.GetComponent<HealthManager>().TakeDamage(damage);
+
+    private void OnDisable()
+    {
+        // Clean up coroutine when disabled so it doesnt run in background
+        if (lifetime != null)
+        {
+            StopCoroutine(lifetime);
+            lifetime = null;
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (!other.gameObject.CompareTag("TurretTrap"))
+        {
+            if (other.gameObject.CompareTag("Enemy"))
+            {
+                HealthManager hm = other.GetComponent<HealthManager>();
+                if (hm != null) hm.TakeDamage(damage);
             }
             this.gameObject.SetActive(false);
-            parentTrap.bullets.Add(this.gameObject);
+            if (parentTrap != null)
+            {
+                parentTrap.bullets.Add(this.gameObject);
+            }
+            else
+            {
+                Debug.LogWarning("Bullet has no parentTrap assigned!");
+            }
             rb.linearVelocity = Vector3.zero;
         }
     }
@@ -39,7 +64,14 @@ public class Bullet : MonoBehaviour
     {
         yield return new WaitForSeconds(maxLifetime);
         this.gameObject.SetActive(false);
-        parentTrap.arrows.Add(this.gameObject);
+        if (parentTrap != null)
+        {
+            parentTrap.bullets.Add(this.gameObject);
+        }
+        else
+        {
+            Debug.LogWarning("Bullet has no parentTrap assigned!");
+        }
         rb.linearVelocity = Vector3.zero;
     }
 }
