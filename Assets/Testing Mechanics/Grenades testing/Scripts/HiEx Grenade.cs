@@ -91,69 +91,22 @@ namespace Aegis.GrenadeSystem.HiEx
         //Function to apply damage to the player or to enemies
         void ApplyDamage()
         {
-            //There are three radii to apply damage;
-            //If a player or enemy is close, near or far from the explosion
-            //Damage will be applied to a greater degree the closer the damaged entity is to the blast
-            //Adjust the damage output and distance/reach of each radii in the DAMAGE settings above
+            HashSet<Collider> alreadyHit = new HashSet<Collider>();
 
-            //close  objects
-            Collider[] closecolliders = Physics.OverlapSphere(transform.position, closeRadius);
-
-            //near objects
-            Collider[] nearbycolliders = Physics.OverlapSphere(transform.position, nearRadius);
-
-            //far objects
-            Collider[] farcolliders = Physics.OverlapSphere(transform.position, farRadius);
-
-            foreach (Collider closeobject in closecolliders)
+            foreach (Collider c in Physics.OverlapSphere(transform.position, closeRadius))
             {
-
-                //if an Enemy or player is nearby the explosion, apply damage
-                if (closeobject.tag == "Player" || closeobject.tag == "Enemy")
-                {
-
-                    DamageHandler healthobject = closeobject.GetComponent<DamageHandler>();
-
-                    if (healthobject)
-                    {
-                        healthobject.ApplyDamage(closeDam);
-                    }
-                }
-
+                if ((c.tag == "Player" || c.tag == "Enemy") && alreadyHit.Add(c))
+                    c.GetComponent<DamageHandler>()?.ApplyDamage(closeDam);
             }
-
-            foreach (Collider nearbyobject in nearbycolliders)
+            foreach (Collider c in Physics.OverlapSphere(transform.position, nearRadius))
             {
-
-                //if an Enemy or player is nearby the explosion, apply damage
-                if (nearbyobject.tag == "Player" || nearbyobject.tag == "Enemy")
-                {
-                    DamageHandler healthobject = nearbyobject.GetComponent<DamageHandler>();
-
-                    if (healthobject)
-                    {
-                        healthobject.ApplyDamage(nearDam);
-                    }
-                }
-
-
-
+                if ((c.tag == "Player" || c.tag == "Enemy") && alreadyHit.Add(c))
+                    c.GetComponent<DamageHandler>()?.ApplyDamage(nearDam);
             }
-
-            foreach (Collider farobject in farcolliders)
+            foreach (Collider c in Physics.OverlapSphere(transform.position, farRadius))
             {
-
-                //if an Enemy or player is nearby the explosion, apply damage
-                if (farobject.tag == "Player" || farobject.tag == "Enemy")
-                {
-                    DamageHandler healthobject = farobject.GetComponent<DamageHandler>();
-
-                    if (healthobject)
-                    {
-                        healthobject.ApplyDamage(farDam);
-                    }
-                }
-
+                if ((c.tag == "Player" || c.tag == "Enemy") && alreadyHit.Add(c))
+                    c.GetComponent<DamageHandler>()?.ApplyDamage(farDam);
             }
         }
 

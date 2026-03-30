@@ -13,7 +13,7 @@ public class Bullet : MonoBehaviour
 
     private void Start()
     {
-        rb = this.GetComponent<Rigidbody>();
+        //
     }
 
     public void Fire(Vector3 fireDirection, float fireSpeed)

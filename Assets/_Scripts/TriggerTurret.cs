@@ -19,7 +19,7 @@ public class TriggerTurret : MonoBehaviour
 
     private void Start()
     {
-        StartCoroutine(SpawnBullets());
+        SpawnBullets();
     }
 
     private IEnumerator SpawnBullets()
@@ -96,5 +96,17 @@ public class TriggerTurret : MonoBehaviour
         }
 
         isFiring = false;
+    }
+
+    private void SpawnBullets()
+    {
+        for (int i = 0; i < maxBulletCount; i++)
+        {
+            GameObject bullet = Instantiate(bulletPrefab, this.transform);
+            Collider bulletCol = bullet.GetComponent<Collider>();
+            if (bulletCol != null) bulletCol.enabled = false;
+            bullets.Add(bullet);
+            bullet.SetActive(false);
+        }
     }
 }

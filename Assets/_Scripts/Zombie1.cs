@@ -52,7 +52,7 @@ public class Zombie1 : MonoBehaviour
                 currentZombiePosition = 0;
             }
         }
-        transform.position = Vector3.MoveTowards(transform.position, walkPoints[currentZombiePosition].transform.position, zombieSpeed * Time.deltaTime);
+        zombieAgent.SetDestination(walkPoints[currentZombiePosition].transform.position);
         //changes zombie facing
     }
 
