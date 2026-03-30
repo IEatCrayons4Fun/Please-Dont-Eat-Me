@@ -6,7 +6,7 @@ public class CameraController : MonoBehaviour
     InputAction look;
     [Range(0f, 90f)]public float lookXLimit = 45.0f;
     [Range(0.1f, 12f)]public float lookSens = 2.0f;
-    private GameObject player;
+    public GameObject player;
     private float rotationX = 0;
     private float rotationY = 0;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
