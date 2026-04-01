@@ -93,20 +93,41 @@ namespace Aegis.GrenadeSystem.HiEx
         {
             HashSet<Collider> alreadyHit = new HashSet<Collider>();
 
-            foreach (Collider c in Physics.OverlapSphere(transform.position, closeRadius))
+                foreach (Collider c in Physics.OverlapSphere(transform.position, closeRadius))
             {
                 if ((c.tag == "Player" || c.tag == "Enemy") && alreadyHit.Add(c))
-                    c.GetComponent<DamageHandler>()?.ApplyDamage(closeDam);
+                {
+                    HealthManager healthManager = c.GetComponent<HealthManager>();
+                    if (healthManager != null)
+                    {
+                        healthManager.TakeDamage(closeDam);
+                        Debug.Log("Close Damaged " + c.gameObject.name);
+                    }
+                }
             }
             foreach (Collider c in Physics.OverlapSphere(transform.position, nearRadius))
             {
                 if ((c.tag == "Player" || c.tag == "Enemy") && alreadyHit.Add(c))
-                    c.GetComponent<DamageHandler>()?.ApplyDamage(nearDam);
+                {
+                    HealthManager healthManager = c.GetComponent<HealthManager>();
+                    if (healthManager != null)
+                    {
+                        healthManager.TakeDamage(nearDam);
+                        Debug.Log("Near Damaged " + c.gameObject.name);
+                    }
+                }
             }
             foreach (Collider c in Physics.OverlapSphere(transform.position, farRadius))
             {
                 if ((c.tag == "Player" || c.tag == "Enemy") && alreadyHit.Add(c))
-                    c.GetComponent<DamageHandler>()?.ApplyDamage(farDam);
+                {
+                    HealthManager healthManager = c.GetComponent<HealthManager>();
+                    if (healthManager != null)
+                    {
+                        healthManager.TakeDamage(farDam);
+                        Debug.Log("Far Damaged " + c.gameObject.name);
+                    }
+                }
             }
         }
 

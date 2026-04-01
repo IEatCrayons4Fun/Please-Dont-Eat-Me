@@ -7,11 +7,12 @@ TagManager:
   - ArrowTrap
   - Enemy
   - TurretTrap
+  - Ground
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Ground
   - Water
   - UI
   - Player

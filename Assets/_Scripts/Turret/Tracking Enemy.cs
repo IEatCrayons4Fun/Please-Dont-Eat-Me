@@ -9,10 +9,13 @@ public class TrackingEnemy : MonoBehaviour
 
     // Reference to the turret to access its in-range list
     private TriggerTurret turret;
+    public SphereCollider detectionCollider;
+
 
     private void Start()
     {
         turret = GetComponentInParent<TriggerTurret>();
+        
         // If TrackingEnemy is on a child object, use GetComponentInParent instead:
         // turret = GetComponentInParent<TriggerTurret>();
     }
@@ -75,5 +78,12 @@ public class TrackingEnemy : MonoBehaviour
         }
 
         return closest != null ? closest.transform : null;
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (detectionCollider == null) return;
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(transform.position, detectionCollider.radius * transform.lossyScale.x);
     }
 }

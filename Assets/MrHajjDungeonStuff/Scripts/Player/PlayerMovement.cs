@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections;
-using System.Collections.Generic;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -15,19 +14,16 @@ public class PlayerMovement : MonoBehaviour
     [Range(1f, 50f)]
     public float sprintSpeed;
 
-    private int count;
-
-    [Range(1f, 10f)]
-    public float jumpHeight = 2f;
+    [Range(1f, 20f)]
+    public float jumpHeight = 7f;
 
     private InputAction jump;
-    private bool isSprinting;
     private InputAction sprint;
+    private bool isSprinting;
 
     [HideInInspector]
     public bool grounded;
 
-    private Vector3 horizontalVelocity;
     float speed;
 
     [SerializeField]
@@ -47,6 +43,8 @@ public class PlayerMovement : MonoBehaviour
 
     private Coroutine changingFOV;
 
+    public LayerMask groundLayer;
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -56,6 +54,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (rb == null) return;
+
         rb.linearDamping = grounded ? 6f : 0f;
         MovePlayer();
         DetectJump();
@@ -75,26 +75,26 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Ground"))
-        {
+        if (((1 << collision.gameObject.layer) & groundLayer.value) != 0)
             grounded = true;
-        }
     }
 
     private void OnCollisionStay(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Ground"))
+        if (((1 << collision.gameObject.layer) & groundLayer.value) != 0)
             grounded = true;
     }
 
     private void OnCollisionExit(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Ground"))
+        if (((1 << collision.gameObject.layer) & groundLayer.value) != 0)
             grounded = false;
     }
 
     private void MovePlayer()
     {
+        if (rb == null) return;
+
         speed = isSprinting ? sprintSpeed : walkSpeed;
         Vector3 inputDir = (transform.forward * movementY + transform.right * movementX).normalized;
         Vector3 targetVelocity = inputDir * speed;
@@ -114,52 +114,43 @@ public class PlayerMovement : MonoBehaviour
 
     private void DetectJump()
     {
-        if (jump.triggered && grounded)
-        {
-            grounded = false;
-            rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z); 
-            rb.AddForce(Vector3.up * jumpHeight, ForceMode.Impulse);
-        }
+        if (jump == null || !jump.triggered || !grounded || rb == null) return;
+
+        grounded = false;
+        var velocity = rb.linearVelocity;
+        velocity.y = 0f;
+        rb.linearVelocity = velocity;
+        rb.AddForce(Vector3.up * jumpHeight, ForceMode.Impulse);
     }
 
     private void DetectSprint()
     {
+        if (sprint == null) return;
+
         if (sprint.WasPressedThisFrame())
         {
             isSprinting = true;
-            if (changingFOV == null)
-            {
-                changingFOV = StartCoroutine(LerpCamFOV(sprintFOV, fovTransitionTime));
-            }
-            else
-            {
-                StopCoroutine(changingFOV);
-                changingFOV = StartCoroutine(LerpCamFOV(sprintFOV, fovTransitionTime));
-            }
+            if (changingFOV != null) StopCoroutine(changingFOV);
+            changingFOV = StartCoroutine(LerpCamFOV(sprintFOV, fovTransitionTime));
         }
         else if (sprint.WasReleasedThisFrame())
         {
             isSprinting = false;
-            if (changingFOV == null)
-            {
-                changingFOV = StartCoroutine(LerpCamFOV(baseFOV, fovTransitionTime));
-            }
-            else
-            {
-                StopCoroutine(changingFOV);
-                changingFOV = StartCoroutine(LerpCamFOV(baseFOV, fovTransitionTime));
-            }
+            if (changingFOV != null) StopCoroutine(changingFOV);
+            changingFOV = StartCoroutine(LerpCamFOV(baseFOV, fovTransitionTime));
         }
     }
 
     private IEnumerator LerpCamFOV(float newFOV, float transitionTime)
     {
         float elapsedTime = 0f;
+        float startFOV = cam.fieldOfView;
         while (elapsedTime < transitionTime)
         {
-            cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, newFOV, transitionTime * Time.deltaTime);
+            cam.fieldOfView = Mathf.Lerp(startFOV, newFOV, elapsedTime / transitionTime);
             elapsedTime += Time.deltaTime;
             yield return null;
         }
+        cam.fieldOfView = newFOV;
     }
 }
