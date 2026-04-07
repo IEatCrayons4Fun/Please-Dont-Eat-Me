@@ -40,16 +40,23 @@ public class ArrowTrap : TrapBase
         float elapsedTime = 0f;
         while(elapsedTime < trapDuration)
         {
-            if(canFire && arrows.Count > 0){
+            if (canFire && arrows.Count > 0 && firePoints != null && firePoints.Length > 0)
+            {
                 StartCoroutine(FireDelay());
                 GameObject randomFirePoint = firePoints[Random.Range(0, firePoints.Length)];
-                GameObject firedArrow = arrows[Random.Range(0, arrows.Count - 1)];
+                GameObject firedArrow = arrows[Random.Range(0, arrows.Count)];
                 firedArrow.transform.position = randomFirePoint.transform.position;
                 firedArrow.SetActive(true);
                 Arrow arrowScript = firedArrow.GetComponent<Arrow>();
-                arrowScript.parentTrap = this;
-                arrowScript.damage = damage;
-                arrowScript.rb.AddForce(randomFirePoint.transform.forward * arrowSpeed, ForceMode.Impulse);
+                if (arrowScript != null)
+                {
+                    arrowScript.parentTrap = this;
+                    arrowScript.damage = damage;
+                    if (arrowScript.rb != null)
+                    {
+                        arrowScript.rb.AddForce(randomFirePoint.transform.forward * arrowSpeed, ForceMode.Impulse);
+                    }
+                }
                 arrows.Remove(firedArrow);
             }
             elapsedTime += Time.deltaTime;
