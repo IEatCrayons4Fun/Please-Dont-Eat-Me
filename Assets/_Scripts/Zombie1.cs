@@ -77,7 +77,7 @@ public class Zombie1 : MonoBehaviour
         zombieAgent.SetDestination(transform.position);
         transform.LookAt(LookPoint);
         
-        if (attackTime > 0){
+        if (attackTimer > 0){
         zombieAnim.SetTrigger("Attack");
         attackTimer = attackCooldown;
         LookPoint.GetComponent<HealthManager>().TakeDamage(15);

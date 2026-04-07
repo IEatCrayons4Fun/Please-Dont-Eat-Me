@@ -31,10 +31,7 @@ public class HealthManager : MonoBehaviour
         Debug.Log("You Respawned");
         if(checkpoint != null){
             this.transform.position = checkpoint.transform.position;
-            if (rb != null)
-            {
-                rb.linearVelocity = Vector3.zero;
-            }
+            rb.linearVelocity = Vector3.zero;
         }
     }
 }
