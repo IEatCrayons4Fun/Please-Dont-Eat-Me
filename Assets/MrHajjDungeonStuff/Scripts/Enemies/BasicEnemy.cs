@@ -8,16 +8,10 @@ public class BasicEnemy : BaseEnemy
     [SerializeField] float attackRate;
 
     private bool attackCooldown;
-    public void OnCollisionEnter(Collision other)
-    {
-        if (other.gameObject.CompareTag("Player") && !attackCooldown)
-        {
+    public void OnCollisionEnter(Collision other){
+        if(other.gameObject.CompareTag("Player") && !attackCooldown){
             StartCoroutine(AttackCooldown());
-            HealthManager healthManager = other.gameObject.GetComponent<HealthManager>();
-            if (healthManager != null)
-            {
-                healthManager.TakeDamage(damage);
-            }
+            other.gameObject.GetComponent<HealthManager>().TakeDamage(damage);
         }
     }
 

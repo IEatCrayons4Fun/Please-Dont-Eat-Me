@@ -15,31 +15,22 @@ public class Arrow : MonoBehaviour
     }
     private void OnEnable()
     {
-        if (lifetime != null)
-        {
-            StopCoroutine(lifetime);
+        if(lifetime == null){
+            lifetime = StartCoroutine(MaxLifetime());
         }
-        lifetime = StartCoroutine(MaxLifetime());
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        if (!other.gameObject.CompareTag("ArrowTrap"))
+        else
         {
-            if (other.gameObject.CompareTag("Player"))
-            {
-                HealthManager healthManager = other.GetComponent<HealthManager>();
-                if (healthManager != null)
-                {
-                    healthManager.TakeDamage(damage);
-                }
+            StopCoroutine(MaxLifetime());
+            lifetime = StartCoroutine(MaxLifetime());
+        }
+    }
+    private void OnTriggerEnter(Collider other){
+        if(!other.gameObject.CompareTag("ArrowTrap")){
+            if(other.gameObject.CompareTag("Player")){
+                other.GetComponent<HealthManager>().TakeDamage(damage);
             }
-
             this.gameObject.SetActive(false);
-            if (parentTrap != null)
-            {
-                parentTrap.arrows.Add(this.gameObject);
-            }
+            parentTrap.arrows.Add(this.gameObject);
             rb.linearVelocity = Vector3.zero;
         }
     }
@@ -48,10 +39,7 @@ public class Arrow : MonoBehaviour
     {
         yield return new WaitForSeconds(maxLifetime);
         this.gameObject.SetActive(false);
-        if (parentTrap != null)
-        {
-            parentTrap.arrows.Add(this.gameObject);
-        }
+        parentTrap.arrows.Add(this.gameObject);
         rb.linearVelocity = Vector3.zero;
     }
 }
