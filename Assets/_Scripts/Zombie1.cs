@@ -90,10 +90,10 @@ public class Zombie1 : MonoBehaviour
     //Checking Aggro Ranges
     private void OnDrawGizmos()
     {
-        Gizmos.color = Color.red;
+        Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, visionRange);
 
-        Gizmos.color = Color.yellow;
+        Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, attackingRange);
     }
 }
