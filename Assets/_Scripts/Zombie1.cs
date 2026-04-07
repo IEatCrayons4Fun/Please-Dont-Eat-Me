@@ -26,9 +26,15 @@ public class Zombie1 : MonoBehaviour
     public bool playerInVisionRange;
     public bool playerInAttackingRange;
 
+    [Header("Zombie Attacking")]
+    public float attackCooldown = 1.5f;
+    public float attackTimer = 0f;
+    public Animator zombieAnim;
+
     private void Awake()
     {
         zombieAgent = GetComponent<NavMeshAgent>();
+        zombieAnim = GetComponent<Animator>();
     }
     
     private void Update()
@@ -39,6 +45,11 @@ public class Zombie1 : MonoBehaviour
         if (!playerInVisionRange && !playerInAttackingRange) Patroling();
         if (playerInVisionRange && !playerInAttackingRange) ChasePlayer();
         if (playerInAttackingRange && playerInVisionRange) AttackPlayer();
+
+        if (attackTimer > 0f){
+            attackTimer -= Time.deltaTime;
+        }
+            
     }
 
 
@@ -58,12 +69,21 @@ public class Zombie1 : MonoBehaviour
 
     private void ChasePlayer()
     {
-        //
+        zombieAgent.SetDestination(LookPoint.position);
     }
 
     private void AttackPlayer()
     {
-        //
+        zombieAgent.SetDestination(transform.position);
+        transform.LookAt(LookPoint);
+        
+        if (attackTime > 0){
+        zombieAnim.SetTrigger("Attack");
+        attackTimer = attackCooldown;
+        LookPoint.GetComponent<HealthManager>().TakeDamage(15);
+        }
+        
+        
     }
 
 
