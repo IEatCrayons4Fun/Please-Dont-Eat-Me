@@ -10,5 +10,6 @@ AssetOrigin:
   productId: 304714
   packageName: Stylized Tree & Grass Samples
   packageVersion: 1.2
-  assetPath: Assets/Symphonie/Stylize Tree &Grasses samples/URP/prefab/low grass.prefab
+  assetPath: Assets/Vegetation/Trees/Stylize Tree &Grasses samples/URP/prefab/low
+    grass.prefab
   uploadId: 877316

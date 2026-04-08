@@ -391,10 +391,10 @@ MonoBehaviour:
   explosionForceRadius: 5
   closeRadius: 2
   nearRadius: 3.5
-  farRadius: 5
-  closeDam: 20
-  nearDam: 10
-  farDam: 5
+  farRadius: 4.5
+  closeDam: 10
+  nearDam: 5
+  farDam: 1
   audioSourcePrefab: {fileID: 538503049481493739, guid: 0d311d84d3635b243b0d32fbfc78633d, type: 3}
   audioSource: {fileID: 0}
   impact: {fileID: 8300000, guid: a44786edd321a4244b37283aa32b3e4d, type: 3}

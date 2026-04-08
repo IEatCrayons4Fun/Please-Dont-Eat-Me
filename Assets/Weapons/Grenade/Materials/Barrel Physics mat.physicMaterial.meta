@@ -11,6 +11,5 @@ AssetOrigin:
   productId: 352898
   packageName: Full Basic Grenade System + Explosion & Sound effects
   packageVersion: 1.0
-  assetPath: Assets/Game Assets/Aegis77/Grenades testing/Materials/Barrel Physics
-    mat.physicMaterial
+  assetPath: Assets/Weapons/Grenade/Materials/Barrel Physics mat.physicMaterial
   uploadId: 860842

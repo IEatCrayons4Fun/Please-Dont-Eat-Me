@@ -14,5 +14,5 @@ AssetOrigin:
   productId: 352898
   packageName: Full Basic Grenade System + Explosion & Sound effects
   packageVersion: 1.0
-  assetPath: Assets/Game Assets/Aegis77/Grenades testing/Scripts/GrenadeSystem.cs
+  assetPath: Assets/_Scripts/Throwable/GrenadeSystem.cs
   uploadId: 860842

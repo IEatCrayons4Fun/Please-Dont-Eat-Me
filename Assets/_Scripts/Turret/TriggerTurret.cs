@@ -5,42 +5,66 @@ using System.Collections.Generic;
 public class TriggerTurret : MonoBehaviour
 {
     [Header("Turret Trap")]
-    [SerializeField] [Range(0.1f, 10f)] private float fireRate;
-    [SerializeField] [Range(1f, 100f)] private float damage;
-    [SerializeField] [Range(1f, 100f)] private int trapDuration;
-    [SerializeField] GameObject[] firePoints;
-    [SerializeField] GameObject bulletPrefab;
-    [SerializeField] private int maxBulletCount;
-    [SerializeField] [Range(1f, 100f)] private float bulletSpeed;
-    [SerializeField] [Range(0.9f, 1f)] private float aimThreshold = 0.98f;
+    [SerializeField] [Range(0.1f, 10f)] private float fireRate = 0.5f;
+    [SerializeField] [Range(1f, 100f)] private float damage = 10f;
+    [SerializeField] private GameObject[] firePoints;
+    [SerializeField] private GameObject bulletPrefab;
+    [SerializeField] private int maxBulletCount = 20;
+    [SerializeField] [Range(1f, 100f)] private float bulletSpeed = 40f;
+    [SerializeField] [Range(0f, 90f)] private float aimAngle = 30f;
+
     [HideInInspector] public List<GameObject> bullets = new List<GameObject>();
     public List<GameObject> enemiesInRange = new List<GameObject>();
     private bool isFiring = false;
 
-    private TrackingEnemy trackingEnemy;
-
     private void Start()
     {
-        trackingEnemy = GetComponentInChildren<TrackingEnemy>();
+        if (bulletPrefab == null)
+        {
+            Debug.LogError("TriggerTurret: bulletPrefab is null");
+            return;
+        }
+
+        if (firePoints == null || firePoints.Length == 0)
+        {
+            Debug.LogError("TriggerTurret: no firePoints assigned");
+            return;
+        }
+
         StartCoroutine(SpawnBullets());
     }
 
     private IEnumerator SpawnBullets()
     {
-        if (bulletPrefab == null || firePoints == null || firePoints.Length == 0)
+        bullets.Clear();
+
+        for (int i = 0; i < maxBulletCount; i++)
         {
-            yield break;
+            GameObject b = Instantiate(bulletPrefab, transform);
+            b.SetActive(false);
+
+            // disable collider while pooled
+            Collider col = b.GetComponent<Collider>();
+            if (col != null) col.enabled = false;
+
+            // set up Rigidbody so the pooled object doesn't simulate
+            Rigidbody rb = b.GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                if (!rb.isKinematic)
+                {
+                    rb.linearVelocity = Vector3.zero;
+                    rb.angularVelocity = Vector3.zero;
+                }
+                rb.isKinematic = true;
+                rb.useGravity = false;
+                rb.linearDamping = 0f;
+                rb.angularDamping = 0f;
+            }
+
+            bullets.Add(b);
         }
 
-        bullets.Clear();
-        while (bullets.Count < maxBulletCount)
-        {
-            GameObject bullet = Instantiate(bulletPrefab, this.transform);
-            Collider bulletCol = bullet.GetComponent<Collider>();
-            if (bulletCol != null) bulletCol.enabled = false;
-            bullets.Add(bullet);
-            bullet.SetActive(false);
-        }
         yield return null;
     }
 
@@ -48,7 +72,9 @@ public class TriggerTurret : MonoBehaviour
     {
         if (other.CompareTag("Enemy"))
         {
-            enemiesInRange.Add(other.gameObject);
+            if (!enemiesInRange.Contains(other.gameObject))
+                enemiesInRange.Add(other.gameObject);
+
             if (!isFiring)
             {
                 isFiring = true;
@@ -65,77 +91,151 @@ public class TriggerTurret : MonoBehaviour
         }
     }
 
-    private bool IsAimedAtTarget(GameObject target)
+    private bool TryGetFacingTarget(out GameObject firePoint, out GameObject targetEnemy)
     {
-        if (target == null || trackingEnemy == null) return false;
+        firePoint = null;
+        targetEnemy = null;
 
-        Vector3 directionToTarget = (target.transform.position - trackingEnemy.transform.position).normalized;
-        float dot = Vector3.Dot(trackingEnemy.transform.forward, directionToTarget);
-        return dot >= aimThreshold;
+        if (firePoints == null || firePoints.Length == 0)
+            return false;
+
+        List<GameObject> validFirePoints = new List<GameObject>();
+
+        foreach (GameObject fp in firePoints)
+        {
+            if (fp == null)
+                continue;
+
+            foreach (GameObject enemy in enemiesInRange)
+            {
+                if (enemy == null)
+                    continue;
+
+                Vector3 toEnemy = enemy.transform.position - fp.transform.position;
+                if (toEnemy == Vector3.zero)
+                    continue;
+
+                if (Vector3.Angle(fp.transform.forward, toEnemy) <= aimAngle)
+                {
+                    validFirePoints.Add(fp);
+                    break;
+                }
+            }
+        }
+
+        if (validFirePoints.Count == 0)
+            return false;
+
+        firePoint = validFirePoints[Random.Range(0, validFirePoints.Count)];
+
+        foreach (GameObject enemy in enemiesInRange)
+        {
+            if (enemy == null)
+                continue;
+
+            Vector3 toEnemy = enemy.transform.position - firePoint.transform.position;
+            if (toEnemy == Vector3.zero)
+                continue;
+
+            if (Vector3.Angle(firePoint.transform.forward, toEnemy) <= aimAngle)
+            {
+                targetEnemy = enemy;
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private IEnumerator Firing()
     {
-        float elapsedTime = 0f;
-        while (elapsedTime < trapDuration)
+        while (true)
         {
             enemiesInRange.RemoveAll(e => e == null);
 
             if (enemiesInRange.Count == 0)
             {
-                yield return new WaitUntil(() => enemiesInRange.Count > 0);
-                elapsedTime = 0f;
+                isFiring = false;
+                yield break;
             }
 
             if (firePoints == null || firePoints.Length == 0)
             {
+                isFiring = false;
                 yield break;
             }
 
-            GameObject currentTarget = enemiesInRange[0];
-            yield return new WaitUntil(() =>
-            {
-                enemiesInRange.RemoveAll(e => e == null);
-                if (enemiesInRange.Count == 0) return true;
-                currentTarget = enemiesInRange[0];
-                return IsAimedAtTarget(currentTarget);
-            });
-
-            if (enemiesInRange.Count == 0)
-            {
-                yield return new WaitUntil(() => enemiesInRange.Count > 0);
-                elapsedTime = 0f;
-                continue;
-            }
-
+            // Fire one bullet if available and the turret is looking at a valid target
             if (bullets.Count > 0)
             {
-                GameObject randomFirePoint = firePoints[Random.Range(0, firePoints.Length)];
+                if (!TryGetFacingTarget(out GameObject firePoint, out GameObject targetEnemy))
+                {
+                    yield return new WaitForSeconds(fireRate);
+                    continue;
+                }
+
+
                 GameObject firedBullet = bullets[Random.Range(0, bullets.Count)];
-                firedBullet.transform.position = randomFirePoint.transform.position;
+
+                // Place and orient the bullet at the muzzle
+                float spawnOffset = 0.2f;
+                firedBullet.transform.position = firePoint.transform.position + firePoint.transform.forward * spawnOffset;
+                // If your bullet faces up (Y+) instead of forward (Z+)
+                Quaternion offset = Quaternion.Euler(90f, 0f, 0f);
+                firedBullet.transform.rotation =
+                    Quaternion.LookRotation(firePoint.transform.forward) * offset;
                 firedBullet.transform.SetParent(null);
                 firedBullet.SetActive(true);
+
                 Collider bulletCol = firedBullet.GetComponent<Collider>();
                 if (bulletCol != null) bulletCol.enabled = true;
+
+                Rigidbody rb = firedBullet.GetComponent<Rigidbody>();
+                Vector3 direction = firePoint.transform.forward.normalized;
+                if (rb != null)
+                {
+                    rb.isKinematic = false;
+                    rb.useGravity = false; // no drop
+                    rb.linearDamping = 0f;
+                    rb.angularDamping = 0f;
+                }
+
                 Bullet bulletScript = firedBullet.GetComponent<Bullet>();
                 if (bulletScript != null)
                 {
                     bulletScript.parentTrap = this;
                     bulletScript.damage = damage;
-                    bulletScript.Fire(randomFirePoint.transform.forward, bulletSpeed);
+                    bulletScript.OnFired(direction, bulletSpeed);
                 }
+
                 bullets.Remove(firedBullet);
-
-                yield return new WaitForSeconds(fireRate);
-            }
-            else
-            {
-                yield return null;
             }
 
-            elapsedTime += Time.deltaTime;
+            yield return new WaitForSeconds(fireRate);
+        }
+    }
+
+    // Called from Bullet to return to the pool
+    public void ReturnBulletToPool(GameObject b)
+    {
+        if (b == null) return;
+
+        Rigidbody rb = b.GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+            rb.isKinematic = true;
+            rb.useGravity = false;
         }
 
-        isFiring = false;
+        Collider col = b.GetComponent<Collider>();
+        if (col != null) col.enabled = false;
+
+        b.transform.SetParent(this.transform);
+        b.SetActive(false);
+
+        if (!bullets.Contains(b))
+            bullets.Add(b);
     }
 }
