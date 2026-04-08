@@ -7,44 +7,57 @@ public class HealthManager : MonoBehaviour
     public float maxHealth = 100f;
     [HideInInspector] public float currentHealth;
     private Rigidbody rb;
-
     public Image fillBar;
 
-    void Start(){
+    void Start()
+    {
         currentHealth = maxHealth;
         rb = this.GetComponent<Rigidbody>();
         UpdateHealthBar();
     }
 
-    public void TakeDamage(float damage){
+    public void TakeDamage(float damage)
+    {
         currentHealth -= damage;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
-        Debug.Log("Took Damage: " + damage + " | HP Remaining: " + currentHealth);
         UpdateHealthBar();
-        if(currentHealth <= 0){
-            //You might want to change this if you wanted a respawn screen.
+        if (currentHealth <= 0)
+        {
             Respawn();
         }
     }
 
-    public void Heal(float healAmount){
+    public void Heal(float healAmount)
+    {
         currentHealth += healAmount;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
         UpdateHealthBar();
     }
 
-    private void Respawn(){
-        Debug.Log("You Respawned");
-        if(checkpoint != null){
+    private void Respawn()
+    {
+        if (checkpoint != null)
+        {
             this.transform.position = checkpoint.transform.position;
             rb.linearVelocity = Vector3.zero;
+            currentHealth = maxHealth;
             UpdateHealthBar();
         }
-    }
-    private void UpdateHealthBar(){
-        if(fillBar != null){
-            fillBar.fillAmount = currentHealth / maxHealth;
+        else
+        {
+            Debug.LogWarning("No checkpoint assigned!");
         }
     }
 
+    private void UpdateHealthBar()
+    {
+        if (fillBar != null)
+        {
+            fillBar.fillAmount = currentHealth / maxHealth;
+        }
+        else
+        {
+            Debug.LogWarning("Fill Bar not assigned in Inspector!");
+        }
+    }
 }

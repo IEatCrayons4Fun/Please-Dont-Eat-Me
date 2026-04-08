@@ -70,8 +70,10 @@ public class TriggerTurret : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        
         if (other.CompareTag("Enemy"))
         {
+            
             if (!enemiesInRange.Contains(other.gameObject))
                 enemiesInRange.Add(other.gameObject);
 
