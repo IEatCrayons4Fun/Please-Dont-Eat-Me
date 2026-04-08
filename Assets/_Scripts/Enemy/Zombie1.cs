@@ -11,6 +11,7 @@ public class Zombie1 : MonoBehaviour
     public NavMeshAgent zombieAgent;
     public Transform LookPoint;
     public LayerMask playerLayer;
+    public HealthManager Player;
     
     
 
@@ -30,6 +31,9 @@ public class Zombie1 : MonoBehaviour
     public float attackCooldown = 1.5f;
     public float attackTimer = 0f;
     public Animator zombieAnim;
+
+    public float damage = 0f;
+
 
     private void Awake()
     {
@@ -51,11 +55,17 @@ public class Zombie1 : MonoBehaviour
         }
             
     }
-
+    private void SetAnimationState(string state)
+    {
+        zombieAnim.SetBool("IsWalking", state == "IsWalking");
+        zombieAnim.SetBool("IsIdle", state == "IsIdle");
+    }
+    
 
     private void Patroling()
     {
         if(walkPoints.Length == 0) return; // No walk points assigned, skip patrolling
+
         if(Vector3.Distance(walkPoints[currentZombiePosition].transform.position, transform.position) < walkingPointRadius)
         {
             currentZombiePosition = Random.Range(0, walkPoints.Length);
@@ -66,25 +76,32 @@ public class Zombie1 : MonoBehaviour
         }
         zombieAgent.SetDestination(walkPoints[currentZombiePosition].transform.position);
         //changes zombie facing
+        SetAnimationState("IsWalking");
     }
 
     private void ChasePlayer()
     {
         zombieAgent.SetDestination(LookPoint.position);
+        SetAnimationState("IsWalking");
+
     }
 
     private void AttackPlayer()
     {
         zombieAgent.SetDestination(transform.position);
         transform.LookAt(LookPoint);
-        
+        SetAnimationState("IsIdle");
         if (attackTimer <= 0){
             if (zombieAnim != null){
                 zombieAnim.SetTrigger("Attack");
             }
             attackTimer = attackCooldown;
-            LookPoint.GetComponent<HealthManager>().TakeDamage(15f);
-            Debug.Log("Attacked Player");
+            if (Player != null){
+                Player.TakeDamage(damage);
+            }
+            else{
+                Debug.LogWarning("Player does not have a HealthManager component.");
+            }   
         }
         
         

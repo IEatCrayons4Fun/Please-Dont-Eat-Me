@@ -13,7 +13,7 @@ namespace Aegis.GrenadeSystem.HiEx
         [SerializeField] Transform throwPoint;
         [SerializeField] Transform cam;
         [SerializeField] GameObject hiexgrenade;
-        [SerializeField] GameObject grenadecountUI;
+        [SerializeField] GameObject grenadecount;
         [SerializeField] AudioClip throwAudio;
 
         [Header("Throwing Settings")]
@@ -28,15 +28,15 @@ namespace Aegis.GrenadeSystem.HiEx
         [SerializeField] Image cooldownImage;
 
         [Header("UI")]
-        [SerializeField] GameObject grenadeUI;
+        [SerializeField] GameObject grenadeCountUI;
         private bool hasPickedUpGrenade = false;
 
         Coroutine throwGrenade = null;
 
         private void Start()
         {
-            if (grenadeUI != null)
-                grenadeUI.SetActive(false);
+            if (grenadeCountUI != null)
+                grenadeCountUI.SetActive(false);
 
             if (cooldownImage != null)
                 cooldownImage.fillAmount = 0f;
@@ -99,8 +99,8 @@ namespace Aegis.GrenadeSystem.HiEx
             if (!hasPickedUpGrenade)
             {
                 hasPickedUpGrenade = true;
-                if (grenadeUI != null)
-                    grenadeUI.SetActive(true);
+                if (grenadeCountUI != null)
+                    grenadeCountUI.SetActive(true);
             }
         }
 
@@ -108,21 +108,24 @@ namespace Aegis.GrenadeSystem.HiEx
         {
             hasPickedUpGrenade = false;
             grenadeCount = 0;
-            if (grenadeUI != null)
-                grenadeUI.SetActive(false);
+            if (grenadeCountUI != null)
+                grenadeCountUI.SetActive(false);
             UpdateGrenadeCount();
         }
 
         void UpdateGrenadeCount()
         {
-            grenadecountUI.GetComponent<TMPro.TextMeshProUGUI>().text = grenadeCount.ToString();
-
-            if (cooldownImage != null)
+            if (grenadecount != null)
             {
-                if (grenadeCount > 0 && !onCooldown)
-                    cooldownImage.fillAmount = 1f;
-                else if (grenadeCount <= 0 && !onCooldown)
-                    cooldownImage.fillAmount = 0f;
+                    grenadecount.GetComponent<TMPro.TextMeshProUGUI>().text = grenadeCount.ToString();
+
+                if (cooldownImage != null)
+                {
+                    if (grenadeCount > 0 && !onCooldown)
+                        cooldownImage.fillAmount = 1f;
+                    else if (grenadeCount <= 0 && !onCooldown)
+                        cooldownImage.fillAmount = 0f;
+                }
             }
         }
     }
