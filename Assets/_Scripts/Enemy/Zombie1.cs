@@ -24,6 +24,7 @@ public class Zombie1 : MonoBehaviour
     [Header("Zombie Aggro")]
     public float visionRange;
     public float attackingRange;
+    public Vector3 sphereOffset;
     public bool playerInVisionRange;
     public bool playerInAttackingRange;
 
@@ -39,12 +40,16 @@ public class Zombie1 : MonoBehaviour
     {
         zombieAgent = GetComponent<NavMeshAgent>();
         zombieAnim = GetComponent<Animator>();
+        if (zombieAgent == null)
+        {
+            zombieAgent.stoppingDistance = attackingRange;
+        }
     }
     
     private void Update()
     {
         playerInVisionRange = Physics.CheckSphere(transform.position, visionRange, playerLayer);
-        playerInAttackingRange = Physics.CheckSphere(transform.position, attackingRange, playerLayer);
+        playerInAttackingRange = Physics.CheckSphere(transform.position + sphereOffset, attackingRange, playerLayer);
 
         if (!playerInVisionRange && !playerInAttackingRange) Patroling();
         if (playerInVisionRange && !playerInAttackingRange) ChasePlayer();
@@ -81,6 +86,7 @@ public class Zombie1 : MonoBehaviour
 
     private void ChasePlayer()
     {
+        zombieAgent.isStopped = false;
         zombieAgent.SetDestination(LookPoint.position);
         SetAnimationState("IsWalking");
 
@@ -88,7 +94,7 @@ public class Zombie1 : MonoBehaviour
 
     private void AttackPlayer()
     {
-        zombieAgent.SetDestination(transform.position);
+        zombieAgent.isStopped = true;
         transform.LookAt(LookPoint);
         SetAnimationState("IsIdle");
         if (attackTimer <= 0){
@@ -115,6 +121,6 @@ public class Zombie1 : MonoBehaviour
         Gizmos.DrawWireSphere(transform.position, visionRange);
 
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, attackingRange);
+        Gizmos.DrawWireSphere(transform.position + sphereOffset, attackingRange);
     }
 }

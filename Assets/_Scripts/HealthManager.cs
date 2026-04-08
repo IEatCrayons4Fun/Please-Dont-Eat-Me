@@ -43,10 +43,6 @@ public class HealthManager : MonoBehaviour
             currentHealth = maxHealth;
             UpdateHealthBar();
         }
-        else
-        {
-            Debug.LogWarning("No checkpoint assigned!");
-        }
     }
 
     private void UpdateHealthBar()
@@ -54,10 +50,6 @@ public class HealthManager : MonoBehaviour
         if (fillBar != null)
         {
             fillBar.fillAmount = currentHealth / maxHealth;
-        }
-        else
-        {
-            Debug.LogWarning("Fill Bar not assigned in Inspector!");
         }
     }
 }
