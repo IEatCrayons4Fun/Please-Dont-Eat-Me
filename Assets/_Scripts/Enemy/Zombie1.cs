@@ -55,6 +55,7 @@ public class Zombie1 : MonoBehaviour
 
     private void Patroling()
     {
+        if(walkPoints.Length == 0) return; // No walk points assigned, skip patrolling
         if(Vector3.Distance(walkPoints[currentZombiePosition].transform.position, transform.position) < walkingPointRadius)
         {
             currentZombiePosition = Random.Range(0, walkPoints.Length);
@@ -77,10 +78,13 @@ public class Zombie1 : MonoBehaviour
         zombieAgent.SetDestination(transform.position);
         transform.LookAt(LookPoint);
         
-        if (attackTimer > 0){
-        zombieAnim.SetTrigger("Attack");
-        attackTimer = attackCooldown;
-        LookPoint.GetComponent<HealthManager>().TakeDamage(15);
+        if (attackTimer <= 0){
+            if (zombieAnim != null){
+                zombieAnim.SetTrigger("Attack");
+            }
+            attackTimer = attackCooldown;
+            LookPoint.GetComponent<HealthManager>().TakeDamage(15f);
+            Debug.Log("Attacked Player");
         }
         
         

@@ -5,7 +5,7 @@ public class CameraController : MonoBehaviour
 {
     InputAction look;
     [Range(0f, 90f)]public float lookXLimit = 45.0f;
-    [Range(0.1f, 12f)]public float lookSens = 2.0f;
+    [Range(0.1f, 100f)]public float lookSens = 2.0f;
     private GameObject player;
     private float rotationX = 0;
     private float rotationY = 0;

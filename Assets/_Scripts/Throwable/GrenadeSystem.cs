@@ -8,120 +8,122 @@ namespace Aegis.GrenadeSystem.HiEx
 {
     public class GrenadeSystem : MonoBehaviour
     {
-
-        //This system handles the grenade inventory (count) and throwing mechanic
-        [Header("Grenade throwing system settings")]
+        [Header("Grenade Throwing System Settings")]
         [SerializeField] GameObject player;
         [SerializeField] Transform throwPoint;
-        [SerializeField] Transform camera;
+        [SerializeField] Transform cam;
         [SerializeField] GameObject hiexgrenade;
         [SerializeField] GameObject grenadecountUI;
         [SerializeField] AudioClip throwAudio;
-        
-        [Header("Cooldown UI")]
-        [SerializeField] Image cooldownUI;
 
-        //throwing settings
-        [SerializeField] float grenadeCount = 1f; // number of grenades in inventory by default
-        [SerializeField] float throwDelay = 0.3f; // delay after pressing throw before grenade is thrown to account for animations/audio
-        [SerializeField] float throwForce = 3f; // tweak this to adjust how far the grenade is thrown
-        
-        [SerializeField] float cooldownDuration = 2f;
-        private float cooldownRemaining = 0f;
+        [Header("Throwing Settings")]
+        [SerializeField] int grenadeCount = 0;
+        [SerializeField] float throwDelay = 0.3f;
+        [SerializeField] float throwForce = 4f;
 
+        [Header("Grenade Cooldown")]
+        [SerializeField] float grenadeCooldown = 3f;
+        private float cooldownTimer = 0f;
+        private bool onCooldown = false;
+        [SerializeField] Image cooldownImage;
+
+        [Header("UI")]
+        [SerializeField] GameObject grenadeUI;
+        private bool hasPickedUpGrenade = false;
 
         Coroutine throwGrenade = null;
 
-
-        //When the 'G' key is pressed, a grenade is thrown if grenadeCount is more than 0
-        // You can update this to use the input system or key that you'd prefer
-
-
         private void Start()
         {
-            // set grenade count in UI
+            if (grenadeUI != null)
+                grenadeUI.SetActive(false);
+
+            if (cooldownImage != null)
+                cooldownImage.fillAmount = 0f;
+
             UpdateGrenadeCount();
-
-            if (cooldownUI != null)
-            {
-                cooldownUI.fillAmount = 1f;
-            }
         }
-
 
         private void Update()
         {
-            if (cooldownRemaining > 0f)
+            if (onCooldown)
             {
-                cooldownRemaining -= Time.deltaTime;
-                if (cooldownRemaining <= 0f) cooldownUI.fillAmount = 0f;
+                cooldownTimer -= Time.deltaTime;
+                if (cooldownImage != null)
+                    cooldownImage.fillAmount = cooldownTimer / grenadeCooldown;
+
+                if (cooldownTimer <= 0f)
+                {
+                    onCooldown = false;
+                    cooldownTimer = 0f;
+                    UpdateGrenadeCount();
+                }
             }
-            
-            // Update UI fill (we want the image to "fill up" while cooldown progresses).
-            // filledRatio = 1 when ready, 0 when just used. Using 1 - (remaining / duration)
-            if (cooldownUI != null)
-            {
-                float filledRatio = (cooldownDuration <= 0f) ? 1f : 1f - (cooldownRemaining / cooldownDuration);
-                cooldownUI.fillAmount = Mathf.Clamp01(filledRatio);
-            }
-        
-            //When G is pressed
+
             if (Input.GetKeyDown(KeyCode.G))
             {
-
-                //Check if a grenade is already being thrown - if not, and there are grenades in the inventory, throw a grenade
-                // This is so grenades can't be spammed
-
-                if (grenadeCount > 0 && throwGrenade == null && cooldownRemaining <= 0f)
+                if (grenadeCount > 0 && throwGrenade == null && !onCooldown)
                 {
                     throwGrenade = StartCoroutine(ThrowGrenade());
                 }
             }
         }
 
-
-        //This is the grenade throwing Co-routine which handles the actions of throwing a grenade
         IEnumerator ThrowGrenade()
         {
-            //decrement the count of grenades in the inventory
             grenadeCount -= 1;
-
             UpdateGrenadeCount();
 
-            //play audio of throwing a grenade
+            onCooldown = true;
+            cooldownTimer = grenadeCooldown;
+            if (cooldownImage != null)
+                cooldownImage.fillAmount = 1f;
+
             player.GetComponent<AudioSource>().clip = throwAudio;
             player.GetComponent<AudioSource>().Play();
 
-            //wait for audio to begin playing - this delay is to account for the pin being pulled, but you can edit it above
             yield return new WaitForSeconds(throwDelay);
 
-            //throw the grenade
             GameObject grenadeInstance = Instantiate(hiexgrenade, throwPoint.position, throwPoint.rotation);
-
             Rigidbody rb = grenadeInstance.GetComponent<Rigidbody>();
-
-            rb.AddForce(camera.forward * throwForce, ForceMode.Impulse);
-
-            cooldownRemaining = cooldownDuration;
-            
-            //set throwGrenade verable to null, so another grenade can be thrown
+            rb.AddForce(cam.forward * throwForce, ForceMode.Impulse);
 
             throwGrenade = null;
         }
 
-        // Function to add a grenade to the inventory when one is picked up
         public void PickupGrenade()
         {
             grenadeCount += 1;
+            UpdateGrenadeCount();
 
+            if (!hasPickedUpGrenade)
+            {
+                hasPickedUpGrenade = true;
+                if (grenadeUI != null)
+                    grenadeUI.SetActive(true);
+            }
+        }
+
+        public void HideGrenadeUI()
+        {
+            hasPickedUpGrenade = false;
+            grenadeCount = 0;
+            if (grenadeUI != null)
+                grenadeUI.SetActive(false);
             UpdateGrenadeCount();
         }
 
-        //Function to update the number of grenades displayed in the UI
         void UpdateGrenadeCount()
         {
             grenadecountUI.GetComponent<TMPro.TextMeshProUGUI>().text = grenadeCount.ToString();
-        }
 
+            if (cooldownImage != null)
+            {
+                if (grenadeCount > 0 && !onCooldown)
+                    cooldownImage.fillAmount = 1f;
+                else if (grenadeCount <= 0 && !onCooldown)
+                    cooldownImage.fillAmount = 0f;
+            }
+        }
     }
 }

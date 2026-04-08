@@ -110,5 +110,6 @@ AssetOrigin:
   productId: 304714
   packageName: Stylized Tree & Grass Samples
   packageVersion: 1.2
-  assetPath: Assets/Symphonie/Stylize Tree &Grasses samples/Model/low grass LOD.fbx
+  assetPath: Assets/Vegetation/Trees/Stylize Tree &Grasses samples/Model/low grass
+    LOD.fbx
   uploadId: 877316

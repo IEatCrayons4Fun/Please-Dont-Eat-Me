@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 76064102f8c69784584e66254ca1719e
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 2633
+  packageName: Motion Sensor Gun
+  packageVersion: 1.2
+  assetPath: Assets/Motion Sensor Gun/Materials/1K_Gun_TXTR.mat
+  uploadId: 26505

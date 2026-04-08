@@ -1,81 +1,116 @@
 using UnityEngine;
-using System.Collections;
 
 public class Bullet : MonoBehaviour
 {
-    public TriggerTurret parentTrap;
-    public float damage;
-    public Rigidbody rb;
-    public float maxLifetime;
-    private Coroutine lifetime;
-    private Vector3 direction;
-    private float speed;
+    [HideInInspector] public TriggerTurret parentTrap;
+    [HideInInspector] public float damage = 10f;
+    [SerializeField] private float lifeSeconds = 5f;
+    [SerializeField] private float damageCooldown = 0.5f;
 
-    private void Start()
-    {
-        //
-    }
+    private float lifeTimer;
+    private float lastDamageTime = -Mathf.Infinity;
+    private Rigidbody rb;
 
-    public void Fire(Vector3 fireDirection, float fireSpeed)
+    private void Awake()
     {
-        direction = fireDirection.normalized;
-        speed = fireSpeed;
-    }
-
-    private void Update()
-    {
-        transform.position += direction * speed * Time.deltaTime;
+        rb = GetComponent<Rigidbody>();
+        // Do NOT set velocity here.
+        // rb.velocity = ... // <- remove any velocity-setting here
     }
 
     private void OnEnable()
     {
-        if (lifetime == null)
-        {
-            lifetime = StartCoroutine(MaxLifetime());
-        }
-        else
-        {
-            StopCoroutine(lifetime);
-            lifetime = StartCoroutine(MaxLifetime());
-        }
+        lifeTimer = lifeSeconds;
+        // Do not initialize movement here. Movement happens in OnFired
     }
 
-    private void OnDisable()
+    public void OnFired(Vector3 direction, float speed)
     {
-        if (lifetime != null)
+        // make sure physics is enabled before setting velocity
+        if (rb != null)
         {
-            StopCoroutine(lifetime);
-            lifetime = null;
+            rb.isKinematic = false;
+            rb.useGravity = false;
+            rb.linearVelocity = direction.normalized * speed;
         }
-        direction = Vector3.zero;
+        lifeTimer = lifeSeconds;
+        lastDamageTime = -Mathf.Infinity;
+    }
+
+    private void Update()
+    {
+        lifeTimer -= Time.deltaTime;
+        if (lifeTimer <= 0f) ReturnToPool();
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (!other.gameObject.CompareTag("TurretTrap"))
+        if (parentTrap != null)
         {
-            if (other.gameObject.CompareTag("Enemy"))
+            Transform trapRoot = parentTrap.transform;
+            if (other.transform == trapRoot || other.transform.IsChildOf(trapRoot))
             {
-                HealthManager hm = other.GetComponent<HealthManager>();
-                if (hm != null) hm.TakeDamage(damage);
+                return;
             }
-            this.gameObject.SetActive(false);
-            if (parentTrap != null)
+        }
+
+        if (Time.time - lastDamageTime < damageCooldown)
+        {
+            return;
+        }
+
+        bool hitEnemy = false;
+        if (other.gameObject.CompareTag("Enemy"))
+        {
+            HealthManager health = other.gameObject.GetComponent<HealthManager>();
+            if (health != null)
             {
-                this.transform.SetParent(parentTrap.transform);
-                parentTrap.bullets.Add(this.gameObject);
+                health.TakeDamage(damage);
+                lastDamageTime = Time.time;
+                hitEnemy = true;
+                Debug.Log("Bullet hit " + other.gameObject.name + " for " + damage + " damage.");
             }
+        }
+
+        // Return to pool after hitting something meaningful.
+        if (hitEnemy || !other.gameObject.CompareTag("Bullet"))
+        {
+            ReturnToPool();
         }
     }
 
-    private IEnumerator MaxLifetime()
+    private void ReturnToPool()
     {
-        yield return new WaitForSeconds(maxLifetime);
-        this.gameObject.SetActive(false);
-        if (parentTrap != null)
+        if (parentTrap != null) parentTrap.ReturnBulletToPool(gameObject);
+        else Destroy(gameObject);
+    }
+
+    private void OnDrawGizmos()
+    {
+        Collider col = GetComponent<Collider>();
+        if (col == null)
+            return;
+
+        Gizmos.color = Color.cyan;
+
+        if (col is SphereCollider sphere)
         {
-            this.transform.SetParent(parentTrap.transform);
-            parentTrap.bullets.Add(this.gameObject);
+            Matrix4x4 oldMatrix = Gizmos.matrix;
+            Gizmos.matrix = transform.localToWorldMatrix;
+            Gizmos.DrawWireSphere(sphere.center, sphere.radius);
+            Gizmos.matrix = oldMatrix;
+            return;
         }
+
+        if (col is BoxCollider box)
+        {
+            Matrix4x4 oldMatrix = Gizmos.matrix;
+            Gizmos.matrix = transform.localToWorldMatrix;
+            Gizmos.DrawWireCube(box.center, box.size);
+            Gizmos.matrix = oldMatrix;
+            return;
+        }
+
+        Gizmos.DrawWireCube(col.bounds.center, col.bounds.size);
     }
 }
