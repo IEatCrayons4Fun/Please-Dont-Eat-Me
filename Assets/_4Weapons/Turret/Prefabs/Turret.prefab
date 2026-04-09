@@ -176,7 +176,7 @@ GameObject:
   - component: {fileID: 6791780019171324933}
   - component: {fileID: 1742933108782190605}
   m_Layer: 0
-  m_Name: Motion gun
+  m_Name: Turret
   m_TagString: TurretTrap
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
