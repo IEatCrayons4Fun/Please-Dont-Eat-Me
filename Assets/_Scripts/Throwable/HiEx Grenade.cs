@@ -91,41 +91,24 @@ namespace Aegis.GrenadeSystem.HiEx
         //Function to apply damage to the player or to enemies
         void ApplyDamage()
         {
-            HashSet<Collider> alreadyHit = new HashSet<Collider>();
+            Collider[] closecolliders = Physics.OverlapSphere(transform.position, closeRadius);
+            Collider[] nearbycolliders = Physics.OverlapSphere(transform.position, nearRadius);
+            Collider[] farcolliders = Physics.OverlapSphere(transform.position, farRadius);
 
-                foreach (Collider c in Physics.OverlapSphere(transform.position, closeRadius))
+            foreach (Collider farobject in farcolliders)
             {
-                if ((c.tag == "Player" || c.tag == "Enemy") && alreadyHit.Add(c))
+                if (farobject.tag == "Player" || farobject.tag == "Enemy")
                 {
-                    HealthManager healthManager = c.GetComponent<HealthManager>();
-                    if (healthManager != null)
+                    HealthManager healthobject = farobject.GetComponent<HealthManager>();
+                    if (healthobject)
                     {
-                        healthManager.TakeDamage(closeDam);
-                        Debug.Log("Close Damaged " + c.gameObject.name);
-                    }
-                }
-            }
-            foreach (Collider c in Physics.OverlapSphere(transform.position, nearRadius))
-            {
-                if ((c.tag == "Player" || c.tag == "Enemy") && alreadyHit.Add(c))
-                {
-                    HealthManager healthManager = c.GetComponent<HealthManager>();
-                    if (healthManager != null)
-                    {
-                        healthManager.TakeDamage(nearDam);
-                        Debug.Log("Near Damaged " + c.gameObject.name);
-                    }
-                }
-            }
-            foreach (Collider c in Physics.OverlapSphere(transform.position, farRadius))
-            {
-                if ((c.tag == "Player" || c.tag == "Enemy") && alreadyHit.Add(c))
-                {
-                    HealthManager healthManager = c.GetComponent<HealthManager>();
-                    if (healthManager != null)
-                    {
-                        healthManager.TakeDamage(farDam);
-                        Debug.Log("Far Damaged " + c.gameObject.name);
+                        // Check closest radius first, then near, then far
+                        if (Physics.CheckSphere(farobject.transform.position, closeRadius))
+                            healthobject.TakeDamage(closeDam);
+                        else if (Physics.CheckSphere(farobject.transform.position, nearRadius))
+                            healthobject.TakeDamage(nearDam);
+                        else
+                            healthobject.TakeDamage(farDam);
                     }
                 }
             }
