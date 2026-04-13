@@ -5,7 +5,7 @@ public class ZombieHealth : MonoBehaviour
 {
     [Header("Zombie Health")]
     public float maxHealth = 100f;
-    private float currentHealth;
+    [SerializeField] public float currentHealth;
 
     private Animator zombieAnim;
     private NavMeshAgent zombieAgent;
