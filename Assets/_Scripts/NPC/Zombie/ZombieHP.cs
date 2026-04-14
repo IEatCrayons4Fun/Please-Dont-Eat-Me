@@ -51,7 +51,8 @@ public class ZombieHP : MonoBehaviour
         // Play death animation
         if (zombieAnim != null)
             zombieAnim.SetTrigger("Death");
-
+        LootDropper dropper = GetComponent<LootDropper>();
+        if (dropper != null) dropper.DropLoot();
         // Destroy after death animation finishes
         Destroy(gameObject, 3f);
     }

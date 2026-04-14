@@ -25,6 +25,7 @@ public class InteractionController : MonoBehaviour
     }
 
     private void Interact(){
+        Debug.Log("Trying interact");
         if(Physics.Raycast(CameraSingleton.instance.gameObject.transform.position, CameraSingleton.instance.gameObject.transform.forward, out RaycastHit hitData, interactRange)){
             IInteractable interactable  = hitData.transform.gameObject.GetComponent<IInteractable>();
             if(interactable != null){
