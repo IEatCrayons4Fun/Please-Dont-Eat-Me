@@ -59,7 +59,7 @@ public class Gun : MonoBehaviour
             {
                 
                 GameObject fx = Instantiate(hitParticlePrefab, hit.point, Quaternion.LookRotation(hit.normal));
-                Destroy(fx, 2f);
+                Destroy(fx, 1f);
             }
 
             if (hit.collider.CompareTag("Enemy"))
