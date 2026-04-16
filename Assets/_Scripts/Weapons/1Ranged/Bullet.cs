@@ -85,7 +85,7 @@ public class Bullet : MonoBehaviour
         bool hitEnemy = false;
         if (other.gameObject.CompareTag("Enemy"))
         {
-            ZombieHealth health = other.gameObject.GetComponent<ZombieHealth>();
+            ZombieHP health = other.gameObject.GetComponent<ZombieHP>();
             if (health != null)
             {
                 health.TakeDamage(damage);
