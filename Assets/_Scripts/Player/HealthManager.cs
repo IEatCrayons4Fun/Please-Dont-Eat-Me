@@ -9,6 +9,8 @@ public class HealthManager : MonoBehaviour
     private Rigidbody rb;
     public Image fillBar;
 
+    
+
     void Start()
     {
         currentHealth = maxHealth;
@@ -32,6 +34,7 @@ public class HealthManager : MonoBehaviour
         currentHealth += healAmount;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
         UpdateHealthBar();
+        Debug.Log("Healed");
     }
 
     private void Respawn()

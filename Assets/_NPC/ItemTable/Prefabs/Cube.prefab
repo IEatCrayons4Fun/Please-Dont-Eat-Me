@@ -127,3 +127,4 @@ MonoBehaviour:
   lootType: 1
   amount: 10
   linkedEffect: {fileID: 0}
+  player: {fileID: 2716018994311241274, guid: a15f02374c46af442a98c3ee710524c9, type: 3}

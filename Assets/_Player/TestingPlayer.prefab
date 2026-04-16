@@ -592,6 +592,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::InteractionController
   interactCooldown: 1
   interactRange: 5
+  ignoreLayer:
+    serializedVersion: 2
+    m_Bits: 64
 --- !u!1 &8972826149862148250
 GameObject:
   m_ObjectHideFlags: 0
