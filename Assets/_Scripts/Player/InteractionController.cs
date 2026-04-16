@@ -9,6 +9,7 @@ public class InteractionController : MonoBehaviour
     [SerializeField] float interactCooldown;
     [SerializeField] float interactRange;
     private bool canInteract = true;
+    [SerializeField] private LayerMask ignoreLayer;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -25,7 +26,9 @@ public class InteractionController : MonoBehaviour
     }
 
     private void Interact(){
-        if(Physics.Raycast(CameraSingleton.instance.gameObject.transform.position, CameraSingleton.instance.gameObject.transform.forward, out RaycastHit hitData, interactRange)){
+        Debug.Log("Trying interact");
+        if(Physics.Raycast(CameraSingleton.instance.gameObject.transform.position, CameraSingleton.instance.gameObject.transform.forward, out RaycastHit hitData, interactRange, ~ignoreLayer)){
+            Debug.Log("ray hit: " +hitData.transform.gameObject);
             IInteractable interactable  = hitData.transform.gameObject.GetComponent<IInteractable>();
             if(interactable != null){
                 interactable.Interacted();
@@ -39,4 +42,6 @@ public class InteractionController : MonoBehaviour
         yield return new WaitForSeconds(interactCooldown);
         canInteract = true;
     }
+
+
 }

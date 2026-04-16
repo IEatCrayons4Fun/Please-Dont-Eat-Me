@@ -4,6 +4,7 @@ public class Lever : MonoBehaviour, IInteractable
 {
     [SerializeField] DoorScript door;
     public void Interacted(){
+        Debug.Log("Bllah");
         door.Unlock();
     }
 }

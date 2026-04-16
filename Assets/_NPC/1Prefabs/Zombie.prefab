@@ -1286,6 +1286,7 @@ GameObject:
   - component: {fileID: 1592898073252644045}
   - component: {fileID: 7112777603138916417}
   - component: {fileID: 5711758332213010041}
+  - component: {fileID: 6770250627825662436}
   m_Layer: 0
   m_Name: Zombie
   m_TagString: Enemy
@@ -1426,7 +1427,7 @@ MonoBehaviour:
   walkPoints: []
   zombieSpeed: 4
   visionRange: 20
-  attackingRange: 2
+  attackingRange: 1.5
   sphereOffset: {x: 0, y: 1.5, z: 0}
   playerInVisionRange: 0
   playerInAttackingRange: 0
@@ -1448,6 +1449,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ZombieHP
   maxHealth: 100
   currentHealth: 0
+--- !u!114 &6770250627825662436
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4419884213662134798}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 09a568562585d184ba3969bcb619dcf3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LootDropper
+  lootTable: {fileID: 11400000, guid: 66dbda037f73829499356bbf6b0e986c, type: 2}
+  dropHeight: 0.5
+  dropEffect: {fileID: 1193953125369175018, guid: 7d39067bead4bc14aa0b451564aa5198, type: 3}
 --- !u!1 &4425097061050242686
 GameObject:
   m_ObjectHideFlags: 0
