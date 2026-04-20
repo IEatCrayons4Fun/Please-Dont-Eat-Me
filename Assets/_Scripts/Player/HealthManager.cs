@@ -9,6 +9,10 @@ public class HealthManager : MonoBehaviour
     private Rigidbody rb;
     public Image fillBar;
 
+    [Header("Shield")]
+    private float currentShield = 0f;
+    public bool hasShield;
+
     
 
     void Start()
@@ -35,6 +39,11 @@ public class HealthManager : MonoBehaviour
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
         UpdateHealthBar();
         Debug.Log("Healed");
+    }
+
+    public void Shield(float amount)
+    {
+        //
     }
 
     private void Respawn()

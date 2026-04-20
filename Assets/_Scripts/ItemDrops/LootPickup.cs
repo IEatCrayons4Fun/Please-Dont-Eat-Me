@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class LootPickup : MonoBehaviour, IInteractable
 {
-    public enum LootType { Ammo, Health, Grenade }
+    public enum LootType { Ammo, Health, Grenade, Armor }
     public LootType lootType;
     public int amount = 10;
     [SerializeField] float healAmount;
@@ -40,6 +40,10 @@ public class LootPickup : MonoBehaviour, IInteractable
         else if(lootType.ToString() == "Grenade"){
             Debug.Log("Testing Grenade Pickup");
             player.GetComponent<WeaponManagment>().AddGrenade();
+        }
+        else if (lootType.ToString() == "Armor"){
+            Debug.Log("Picked Up Armor");
+            player.GetComponent<HealthManager>().Shield(amount);
         }
     }
 }

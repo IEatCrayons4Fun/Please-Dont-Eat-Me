@@ -79,25 +79,26 @@ public class Gun : MonoBehaviour, IWeapon
         bool didHit = Physics.Raycast(ray, out RaycastHit hit, range, ~ignoreLayers);
 
         Vector3 endPoint = didHit ? hit.point : ray.origin + ray.direction * range;
-        StartCoroutine(BulletTrail(Barrel.position, endPoint));
-
+        if (bulletTrail != null){
+            StartCoroutine(BulletTrail(Barrel.position, endPoint));
+    }
         if (didHit)
-        {
-            if (hitParticlePrefab != null)
             {
-                GameObject fx = Instantiate(hitParticlePrefab, hit.point, Quaternion.LookRotation(hit.normal));
-                Destroy(fx, 1f);
-            }
+                if (hitParticlePrefab != null)
+                {
+                    GameObject fx = Instantiate(hitParticlePrefab, hit.point, Quaternion.LookRotation(hit.normal));
+                    Destroy(fx, 1f);
+                }
 
-            if (hit.collider.CompareTag("Enemy"))
-            {
-                ZombieHP health = hit.collider.GetComponent<ZombieHP>();
-                if (health != null) health.TakeDamage(damage);
-            }
+                if (hit.collider.CompareTag("Enemy"))
+                {
+                    ZombieHP health = hit.collider.GetComponent<ZombieHP>();
+                    if (health != null) health.TakeDamage(damage);
+                }
 
-            NPCHealth npcHealth = hit.collider.GetComponent<NPCHealth>();
-            if (npcHealth != null) npcHealth.TakeDamage(damage);
-        }
+                NPCHealth npcHealth = hit.collider.GetComponent<NPCHealth>();
+                if (npcHealth != null) npcHealth.TakeDamage(damage);
+            }
     }
 
     private void Reload()

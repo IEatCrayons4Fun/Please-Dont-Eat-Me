@@ -3600,6 +3600,7 @@ MonoBehaviour:
   maxHealth: 100
   currentHealth: 0
   fillBar: {fileID: 7336590619402384034}
+  hasShield: 0
 --- !u!33 &3469287838528326577
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -3756,7 +3757,7 @@ MonoBehaviour:
   lineDuration: 0.05
   Barrel: {fileID: 1296931345}
   muzzleFlash: {fileID: 0}
-  localPositionOffset: {x: 0, y: 0, z: 0}
+  localPositionOffset: {x: -0.05, y: 0.37, z: 0.27}
   localRotationOffset: {x: -90, y: 0, z: -90}
 --- !u!65 &3469287838528326581
 BoxCollider:
