@@ -33,5 +33,13 @@ public class LootPickup : MonoBehaviour, IInteractable
             Debug.Log("Testing Health Pickup");
             player.GetComponent<HealthManager>().Heal(amount);
         }
+        else if(lootType.ToString() == "Ammo"){
+            Debug.Log("Testing Ammo Pickup");
+            player.GetComponent<WeaponManagment>().AddAmmo(amount);
+        }
+        else if(lootType.ToString() == "Grenade"){
+            Debug.Log("Testing Grenade Pickup");
+            player.GetComponent<WeaponManagment>().AddGrenade();
+        }
     }
 }
