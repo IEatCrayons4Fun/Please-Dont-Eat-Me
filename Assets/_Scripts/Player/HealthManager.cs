@@ -41,9 +41,11 @@ public class HealthManager : MonoBehaviour
         Debug.Log("Healed");
     }
 
-    public void Shield(float amount)
+    public void AddShield(float amount)
     {
-        //
+        currentShield += amount;
+        Debug.Log("Shield: " + currentShield);
+        hasShield = true;
     }
 
     private void Respawn()
