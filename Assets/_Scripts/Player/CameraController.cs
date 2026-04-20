@@ -24,7 +24,7 @@ public class CameraController : MonoBehaviour
         rotationX += (look.ReadValue<Vector2>().y * lookSens) * Time.deltaTime;
         rotationY +=  (look.ReadValue<Vector2>().x * lookSens) * Time.deltaTime;
         rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);
-        transform.localRotation = Quaternion.Euler(-rotationX, this.transform.rotation.y, this.transform.rotation.z);
+        transform.localRotation = Quaternion.Euler(-rotationX, 0, 0);
         player.transform.rotation = Quaternion.Euler(0, rotationY, 0);
     }
 }
