@@ -23,6 +23,12 @@ public class Zombie : MonoBehaviour
     public Vector3 sphereOffset;
     public bool playerInVisionRange;
     public bool playerInAttackingRange;
+    
+    [Header("Stealth Detection")]
+    public float detectionSensitivity = 1f; // 0-1, lower = easier to detect stealth
+    private StealthSystem playerStealth;
+    private float alertness = 0f; // 0-1 scale
+    public float alertDecayRate = 0.5f; // How fast alertness decreases
 
     [Header("Zombie Attacking")]
     public float attackCooldown = 1.5f;
@@ -32,6 +38,8 @@ public class Zombie : MonoBehaviour
 
     private Coroutine slowCoroutine = null;
 
+    private GameObject player;
+
     private void Awake()
     {
         zombieAgent = GetComponent<NavMeshAgent>();
@@ -40,19 +48,52 @@ public class Zombie : MonoBehaviour
         {
             zombieAgent.stoppingDistance = attackingRange;
         }
+        
+        // Find the player's stealth system
+        player = PlayerSingleton.instance.gameObject;
+        StealthSystem player = GetComponent<StealthSystem>();
+
     }
 
     private void Update()
     {
+        // Standard detection
         playerInVisionRange = Physics.CheckSphere(transform.position, visionRange, playerLayer);
         playerInAttackingRange = Physics.CheckSphere(transform.position + sphereOffset, attackingRange, playerLayer);
 
-        if (!playerInVisionRange && !playerInAttackingRange) Patroling();
-        if (playerInVisionRange && !playerInAttackingRange) ChasePlayer();
-        if (playerInAttackingRange && playerInVisionRange) AttackPlayer();
+        // Add stealth detection
+        if (playerStealth != null)
+        {
+            DetectBySound();
+        }
+
+        if (!playerInVisionRange && !playerInAttackingRange && alertness <= 0) 
+            Patroling();
+        if ((playerInVisionRange || alertness > 0.5f) && !playerInAttackingRange) 
+            ChasePlayer();
+        if (playerInAttackingRange && playerInVisionRange) 
+            AttackPlayer();
 
         if (attackTimer > 0f)
             attackTimer -= Time.deltaTime;
+        
+        // Decay alertness over time
+        if (alertness > 0f)
+            alertness -= alertDecayRate * Time.deltaTime;
+    }
+
+    private void DetectBySound()
+    {
+        float distanceToPlayer = Vector3.Distance(transform.position, LookPoint.position);
+        float noiseLevel = playerStealth.GetNoiseLevel();
+        
+        // Sound detection: closer + louder = easier to detect
+        float detectionThreshold = visionRange * (1 - (noiseLevel * detectionSensitivity));
+        
+        if (distanceToPlayer < detectionThreshold && noiseLevel > 0)
+        {
+            alertness = Mathf.Min(alertness + (noiseLevel * 0.5f), 1f);
+        }
     }
 
     private void SetAnimationState(string state)
