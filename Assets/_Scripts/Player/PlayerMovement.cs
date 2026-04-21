@@ -24,7 +24,7 @@ public class PlayerMovement : MonoBehaviour
     private bool isSprinting;
     private InputAction sprint;
 
-    [HideInInspector]
+
     public bool grounded;
 
     private Vector3 horizontalVelocity;
@@ -68,6 +68,7 @@ public class PlayerMovement : MonoBehaviour
 
     void OnMove(InputValue movementValue)
     {
+        
         Vector2 movementVector = movementValue.Get<Vector2>();
         movementX = movementVector.x;
         movementY = movementVector.y;
@@ -101,10 +102,11 @@ public class PlayerMovement : MonoBehaviour
 
         if (grounded)
         {
-            Vector3 velocity = rb.linearVelocity;
+            Vector3 velocity = rb.linearVel ocity;
             velocity.x = Mathf.Lerp(velocity.x, targetVelocity.x, Time.fixedDeltaTime * 10f);
             velocity.z = Mathf.Lerp(velocity.z, targetVelocity.z, Time.fixedDeltaTime * 10f);
             rb.linearVelocity = velocity;
+            
         }
         else
         {
