@@ -31,6 +31,8 @@ public class InteractionController : MonoBehaviour
 
     private void CheckLook()
     {
+        if (CameraSingleton.instance == null) return;
+        
         if (Physics.Raycast(
             CameraSingleton.instance.transform.position,
             CameraSingleton.instance.transform.forward,

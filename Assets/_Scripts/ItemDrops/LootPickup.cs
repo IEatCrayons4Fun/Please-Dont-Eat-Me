@@ -5,10 +5,8 @@ public class LootPickup : MonoBehaviour, IInteractable
     public enum LootType { Ammo, Health, Grenade, Armor }
     public LootType lootType;
     public int amount = 10;
-    [SerializeField] float healAmount;
     [HideInInspector] public GameObject linkedEffect;
-
-    [SerializeField] private GameObject player;
+    private GameObject player;
 
     private void Start(){
         player = PlayerSingleton.instance.gameObject;
@@ -43,7 +41,7 @@ public class LootPickup : MonoBehaviour, IInteractable
         }
         else if (lootType.ToString() == "Armor"){
             Debug.Log("Picked Up Armor");
-            player.GetComponent<HealthManager>().Shield(amount);
+            player.GetComponent<HealthManager>().AddShield(amount);
         }
     }
 }

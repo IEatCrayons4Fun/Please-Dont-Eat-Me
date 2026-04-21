@@ -1463,6 +1463,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LootDropper
   lootTable: {fileID: 11400000, guid: 66dbda037f73829499356bbf6b0e986c, type: 2}
   dropHeight: 0.5
+  spreadRadius: 1.5
   dropEffect: {fileID: 1193953125369175018, guid: 7d39067bead4bc14aa0b451564aa5198, type: 3}
 --- !u!1 &4425097061050242686
 GameObject:
