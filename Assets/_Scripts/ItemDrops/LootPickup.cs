@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class LootPickup : MonoBehaviour, IInteractable
 {
-    public enum LootType { Ammo, Health, Grenade, Armor }
+    public enum LootType { Ammo, Health, Grenade, Armor}
     public LootType lootType;
     public int amount = 10;
     [HideInInspector] public GameObject linkedEffect;
