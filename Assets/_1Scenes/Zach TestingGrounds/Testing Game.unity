@@ -3969,7 +3969,9 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   Player: {fileID: 3450698957117075332}
-  walkPoints: []
+  walkPoints:
+  - {fileID: 312983209}
+  - {fileID: 1456770093}
   zombieSpeed: 4
   visionRange: 20
   attackingRange: 2
