@@ -102,7 +102,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (grounded)
         {
-            Vector3 velocity = rb.linearVel ocity;
+            Vector3 velocity = rb.linearVelocity;
             velocity.x = Mathf.Lerp(velocity.x, targetVelocity.x, Time.fixedDeltaTime * 10f);
             velocity.z = Mathf.Lerp(velocity.z, targetVelocity.z, Time.fixedDeltaTime * 10f);
             rb.linearVelocity = velocity;

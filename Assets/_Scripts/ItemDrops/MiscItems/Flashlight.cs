@@ -12,28 +12,28 @@ public class Flashlight : MonoBehaviour, IInteractable
 
     private void Awake()
     {
-        flashlight = GetComponent<Light>();
-        if (flashlight == null){
-            Debug.Log("Need a light on this Game Object")
+        flashlightLight = GetComponent<Light>();
+        if (flashlightLight == null){
+            Debug.Log("Need a light on this Game Object");
         }
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.F)) && flashlight != null
+        if (Input.GetKeyDown(KeyCode.F) && flashlightLight != null)
         {
-            flashlight.enabled = !flashlight.enabled;
+            flashlightLight.enabled = !flashlightLight.enabled;
         }
     }
 
     public void Interacted()
     {
-
+        //
     }
 
     private void Start()
     {
-
+        //
     }
 
 

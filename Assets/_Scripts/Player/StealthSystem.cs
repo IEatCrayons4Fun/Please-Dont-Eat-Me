@@ -4,9 +4,6 @@ using UnityEngine.InputSystem;
 public class StealthSystem : MonoBehaviour
 {
     [Header("Stealth Settings")]
-    [SerializeField] private float stealthFOVThreshold = 45f; // Player FOV when moving slowly
-    [SerializeField] private float detectionRange = 20f;
-    [SerializeField] private float detectionAngle = 120f;
     [SerializeField] private float baseNoiseLevel = 0f;
     [SerializeField] private float sprintNoiseLevel = 1f;
     [SerializeField] private float crouchWalkSpeed = 3f;
@@ -16,6 +13,8 @@ public class StealthSystem : MonoBehaviour
     private float currentNoiseLevel;
     private bool isCrouching;
     private InputAction crouch;
+
+    [SerializeField] private Transform Camera;
     
     private void Start()
     {
@@ -39,12 +38,12 @@ public class StealthSystem : MonoBehaviour
             // Lower/raise camera for visual feedback
             if (isCrouching)
             {
-                transform.position += Vector3.down * 0.5f;
+                Camera.localPosition += Vector3.down * 0.5f;
                 playerMovement.walkSpeed = crouchWalkSpeed;
             }
             else
             {
-                transform.position += Vector3.up * 0.5f;
+                Camera.localPosition += Vector3.up * 0.5f;
                 playerMovement.walkSpeed = 8f; // Reset to default
             }
         }
