@@ -42,17 +42,19 @@ public class ZombieHP : MonoBehaviour
     private void Die()
     {
         isDead = true;
-
-        // Stop the zombie from moving and attacking
         zombieAgent.SetDestination(transform.position);
         zombieAgent.enabled = false;
         zombie.enabled = false;
 
-        // Play death animation
         if (zombieAnim != null)
             zombieAnim.SetTrigger("Death");
 
-        // Destroy after death animation finishes
-        Destroy(gameObject, 3f);
+        // Switch to dead layer so player can walk through
+        gameObject.layer = LayerMask.NameToLayer("Dead Zombie");
+
+        LootDropper dropper = GetComponent<LootDropper>();
+        if (dropper != null) dropper.DropLoot();
+
+        Destroy(gameObject, 2.5f);
     }
 }

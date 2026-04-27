@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Aegis.GrenadeSystem.HiEx
 {
-    public class GrenadePickup : MonoBehaviour
+    public class GrenadePickup : MonoBehaviour, IInteractable
     {
 
         // this script handles picking up a grenade, and should be attatched to the grenade pickup
@@ -12,24 +12,27 @@ namespace Aegis.GrenadeSystem.HiEx
 
         [SerializeField] AudioClip grenadePickupSound;
 
-        //this logic is what happens when a palyer picks up a grenade with this script attatched
-        private void OnTriggerEnter(Collider other)
+        private GameObject player;
+
+        private void Start()
         {
-            //if the player collides with the Grenade pickup, refrerence the Grenade Inventory System and add a grenade to it
-            if (other.tag == "Player")
-            {
-                //add grenade to inventory
-                other.GetComponent<GrenadeSystem>().PickupGrenade();
+            player = PlayerSingleton.instance.gameObject;
+        }
+        //this logic is what happens when a palyer picks up a grenade with this script attatched
+        public void Interacted()
+        {
+
+                player.GetComponent<GrenadeSystem>().PickupGrenade();
 
                 //play pickup sound
-                AudioSource soundSource = other.GetComponent<AudioSource>();
+                AudioSource soundSource = player.GetComponent<AudioSource>();
                 soundSource.clip = grenadePickupSound;
                 soundSource.Play();
 
                 //destory the pickup object
                 Destroy(gameObject);
 
-            }
+            
         }
 
     }
