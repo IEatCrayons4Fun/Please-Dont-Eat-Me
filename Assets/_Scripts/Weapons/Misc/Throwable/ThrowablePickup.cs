@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Aegis.GrenadeSystem.HiEx
 {
-    public class GrenadePickup : MonoBehaviour, IInteractable
+    public class ThrowablePickup : MonoBehaviour, IInteractable
     {
 
         // this script handles picking up a grenade, and should be attatched to the grenade pickup

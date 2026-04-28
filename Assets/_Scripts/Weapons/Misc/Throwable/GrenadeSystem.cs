@@ -13,8 +13,12 @@ namespace Aegis.GrenadeSystem.HiEx
         [SerializeField] Transform throwPoint;
         [SerializeField] Transform cam;
         [SerializeField] GameObject hiexgrenade;
+        [SerializeField] GameObject flashbangPrefab;
         [SerializeField] GameObject grenadecount;
         [SerializeField] AudioClip throwAudio;
+
+        private enum ThrowableType { HiExGrenade, Flashbang }
+        [SerializeField] private ThrowableType currentThrowable = ThrowableType.HiExGrenade;
 
         [Header("Throwing Settings")]
         [SerializeField] int grenadeCount = 0;
@@ -84,9 +88,14 @@ namespace Aegis.GrenadeSystem.HiEx
 
             yield return new WaitForSeconds(throwDelay);
 
-            GameObject grenadeInstance = Instantiate(hiexgrenade, throwPoint.position, throwPoint.rotation);
+            GameObject selectedGrenade = GetSelectedGrenadePrefab();
+            if (selectedGrenade == null)
+                selectedGrenade = hiexgrenade;
+
+            GameObject grenadeInstance = Instantiate(selectedGrenade, throwPoint.position, throwPoint.rotation);
             Rigidbody rb = grenadeInstance.GetComponent<Rigidbody>();
-            rb.AddForce(cam.forward * throwForce, ForceMode.Impulse);
+            if (rb != null)
+                rb.AddForce(cam.forward * throwForce, ForceMode.Impulse);
 
             throwGrenade = null;
         }
@@ -127,6 +136,21 @@ namespace Aegis.GrenadeSystem.HiEx
                         cooldownImage.fillAmount = 0f;
                 }
             }
+        }
+
+        private GameObject GetSelectedGrenadePrefab()
+        {
+            return currentThrowable == ThrowableType.Flashbang ? flashbangPrefab : hiexgrenade;
+        }
+
+        public void SetThrowableToFlashbang()
+        {
+            currentThrowable = ThrowableType.Flashbang;
+        }
+
+        public void SetThrowableToHiExGrenade()
+        {
+            currentThrowable = ThrowableType.HiExGrenade;
         }
     }
 }
