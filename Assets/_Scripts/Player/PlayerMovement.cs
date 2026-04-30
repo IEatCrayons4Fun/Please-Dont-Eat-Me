@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections;
-using System.Collections.Generic;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -15,17 +14,19 @@ public class PlayerMovement : MonoBehaviour
     [Range(1f, 50f)]
     public float sprintSpeed;
 
-    private int count;
-
     [Range(1f, 10f)]
     public float jumpHeight = 2f;
 
     private InputAction jump;
-    private bool isSprinting;
     private InputAction sprint;
-
+    private bool isSprinting;
 
     public bool grounded;
+    [SerializeField] private LayerMask GroundLayer;
+
+    [Header("Ground Check")]
+    [SerializeField] private Transform groundCheck;     // assign a child empty at the feet
+    [SerializeField] private float groundCheckRadius = 0.2f;
 
     private Vector3 horizontalVelocity;
     float speed;
@@ -56,6 +57,9 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
+        // Use a LayerMask-based sphere check to set grounded
+        grounded = Physics.CheckSphere(groundCheck.position, groundCheckRadius, GroundLayer);
+
         rb.linearDamping = grounded ? 6f : 0f;
         MovePlayer();
         DetectJump();
@@ -68,31 +72,12 @@ public class PlayerMovement : MonoBehaviour
 
     void OnMove(InputValue movementValue)
     {
-        
         Vector2 movementVector = movementValue.Get<Vector2>();
         movementX = movementVector.x;
         movementY = movementVector.y;
     }
 
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (collision.gameObject.CompareTag("Ground"))
-        {
-            grounded = true;
-        }
-    }
-
-    private void OnCollisionStay(Collision collision)
-    {
-        if (collision.gameObject.CompareTag("Ground"))
-            grounded = true;
-    }
-
-    private void OnCollisionExit(Collision collision)
-    {
-        if (collision.gameObject.CompareTag("Ground"))
-            grounded = false;
-    }
+    // removed OnCollisionEnter/Stay/Exit tag checks — replaced by LayerMask-based ground check
 
     private void MovePlayer()
     {
@@ -106,7 +91,6 @@ public class PlayerMovement : MonoBehaviour
             velocity.x = Mathf.Lerp(velocity.x, targetVelocity.x, Time.fixedDeltaTime * 10f);
             velocity.z = Mathf.Lerp(velocity.z, targetVelocity.z, Time.fixedDeltaTime * 10f);
             rb.linearVelocity = velocity;
-            
         }
         else
         {
@@ -119,7 +103,7 @@ public class PlayerMovement : MonoBehaviour
         if (jump.triggered && grounded)
         {
             grounded = false;
-            rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z); 
+            rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
             rb.AddForce(Vector3.up * jumpHeight, ForceMode.Impulse);
         }
     }
@@ -162,6 +146,16 @@ public class PlayerMovement : MonoBehaviour
             cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, newFOV, transitionTime * Time.deltaTime);
             elapsedTime += Time.deltaTime;
             yield return null;
+        }
+    }
+
+    // Visualize the ground check in the editor
+    private void OnDrawGizmosSelected()
+    {
+        if (groundCheck != null)
+        {
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
         }
     }
 }
