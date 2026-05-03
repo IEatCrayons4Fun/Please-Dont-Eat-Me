@@ -14,8 +14,7 @@ namespace Aegis.GrenadeSystem.HiEx
         [SerializeField] private float explosionDelay = 2.5f;
         [SerializeField] private float flashRadius = 6f;
         [SerializeField] private float flashDuration = 2f;
-        [SerializeField] private float explosionForce = 250f;
-        [SerializeField] private float explosionForceRadius = 4f;
+        
 
         [Header("Audio Effects")]
         [SerializeField] private GameObject audioSourcePrefab;
