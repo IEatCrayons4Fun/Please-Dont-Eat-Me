@@ -17,7 +17,7 @@ public class HealthManager : MonoBehaviour
     [HideInInspector] public float maxShield = 100f;
     public bool hasShield;
 
-    public bool IsTesting;
+    public bool TestingZombieAttack;
 
     void Start()
     {
@@ -40,8 +40,7 @@ public class HealthManager : MonoBehaviour
         UpdateHealthBar();
         if (currentHealth <= 0)
         {
-            if (IsTesting)
-            {
+            if (TestingZombieAttack == true){
                 currentHealth = maxHealth;
                 UpdateHealthBar();
             }

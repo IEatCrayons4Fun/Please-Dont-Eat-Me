@@ -14,7 +14,7 @@ namespace Aegis.GrenadeSystem.HiEx
         [SerializeField] Transform cam;
         [SerializeField] GameObject hiexgrenade;
         [SerializeField] GameObject flashbangPrefab;
-        [SerializeField] GameObject grenadecount;
+        
         [SerializeField] AudioClip throwAudio;
 
         private enum ThrowableType { HiExGrenade, Flashbang }
@@ -29,18 +29,19 @@ namespace Aegis.GrenadeSystem.HiEx
         [SerializeField] float grenadeCooldown = 3f;
         private float cooldownTimer = 0f;
         private bool onCooldown = false;
-        [SerializeField] Image cooldownImage;
+        
 
         [Header("UI")]
-        [SerializeField] GameObject grenadeCountUI;
+        [SerializeField] GameObject grenadecount;
+        [SerializeField] Image cooldownImage;
         private bool hasPickedUpGrenade = false;
 
         Coroutine throwGrenade = null;
 
         private void Start()
         {
-            if (grenadeCountUI != null)
-                grenadeCountUI.SetActive(false);
+            if (grenadecount != null)
+                grenadecount.SetActive(false);
 
             if (cooldownImage != null)
                 cooldownImage.fillAmount = 0f;
@@ -108,8 +109,8 @@ namespace Aegis.GrenadeSystem.HiEx
             if (!hasPickedUpGrenade)
             {
                 hasPickedUpGrenade = true;
-                if (grenadeCountUI != null)
-                    grenadeCountUI.SetActive(true);
+                if (grenadecount != null)
+                    grenadecount.SetActive(true);
             }
         }
 
@@ -117,8 +118,8 @@ namespace Aegis.GrenadeSystem.HiEx
         {
             hasPickedUpGrenade = false;
             grenadeCount = 0;
-            if (grenadeCountUI != null)
-                grenadeCountUI.SetActive(false);
+            if (grenadecount != null)
+                grenadecount.SetActive(false);
             UpdateGrenadeCount();
         }
 
